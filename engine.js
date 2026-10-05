@@ -49,25 +49,17 @@ function getFuturesSymbols() {
 }
 function getFuturesTickers() {
     return new Promise((resolve, reject) => {
-
         const url =
             "https://api.toobit.com/quote/v1/contract/ticker/24hr";
-
         https.get(url, (res) => {
-
             let data = "";
-
             res.on("data", chunk => {
                 data += chunk;
             });
-
             res.on("end", () => {
-
                 try {
-
                     const result =
                         JSON.parse(data);
-
                     if (!Array.isArray(result)) {
                         reject(
                             new Error(
@@ -76,15 +68,11 @@ function getFuturesTickers() {
                         );
                         return;
                     }
-
                     resolve(result);
-
                 } catch (error) {
                     reject(error);
                 }
-
             });
-
         }).on("error", reject);
     });
 }
@@ -1053,11 +1041,7 @@ function getPriceActionStructure(timeframe) {
             }
         }
         // Swing Low
-        for (
-            let j = 1;
-            j <= lookback;
-            j++
-        ) {
+        for (  let j = 1; j <= lookback; j++ ) {
             if (
                 current.low >= data[i - j].low ||
                 current.low >= data[i + j].low
@@ -1309,30 +1293,14 @@ function calculateCombinedSignal(timeframe) {
     // =================================
     // DISPLAY
     // =================================
-    console.log(
-        `\n🎯 ${timeframe} COMBINED`
-    );
-    console.log(
-        `Bullish Score  : ${bullishScore}`
-    );
-    console.log(
-        `Bearish Score  : ${bearishScore}`
-    );
-    console.log(
-        `Price Action   : ${priceAction.structure}`
-    );
-    console.log(
-        `Breakout       : ${priceAction.breakout}`
-    );
-    console.log(
-        `Candle         : ${priceAction.candleDirection}`
-    );
-    console.log(
-        `Ichimoku Score : ${ichimokuScore}`
-    );
-    console.log(
-        `Result         : ${result}`
-    );
+    console.log( `\n🎯 ${timeframe} COMBINED` );
+    console.log( `Bullish Score  : ${bullishScore}` );
+    console.log(   `Bearish Score  : ${bearishScore}` );
+    console.log( `Price Action   : ${priceAction.structure}` );
+    console.log(  `Breakout       : ${priceAction.breakout}` );
+    console.log( `Candle         : ${priceAction.candleDirection}` );
+    console.log(  `Ichimoku Score : ${ichimokuScore}` );
+    console.log( `Result         : ${result}` );
 }
 function getTimeframeDirection(timeframe) {
     const list = candles[timeframe];
@@ -1372,41 +1340,29 @@ function getTimeframeDirection(timeframe) {
     // =================================
     // PRICE ACTION
     // =================================
-    if (
-        priceAction.structure ===
-        "🟢 BULLISH STRUCTURE"
-    ) {
+    if (  priceAction.structure ===  "🟢 BULLISH STRUCTURE" ) {
         bullish += 2;
     }
-    else if (
-        priceAction.structure ===
-        "🔴 BEARISH STRUCTURE"
-    ) {
+    else if ( priceAction.structure === "🔴 BEARISH STRUCTURE") {
         bearish += 2;
     }
     // =================================
     // BREAKOUT
     // =================================
-    if (
-        priceAction.breakout ===
-        "🟢 BULLISH BREAKOUT"
-    ) {
+    if ( priceAction.breakout ===  "🟢 BULLISH BREAKOUT" ) {
         bullish += 1;
     }
-    else if (
-        priceAction.breakout ===
-        "🔴 BEARISH BREAKDOWN"
-    ) {
+    else if ( priceAction.breakout ===  "🔴 BEARISH BREAKDOWN" ) {
         bearish += 1;
     }
     // =================================
     // ICHIMOKU
     // =================================
-    if (ichimokuScore > 0) {
+    if (ichimokuScore > 0) { 
         bullish += ichimokuScore;
-    }
-    else if (ichimokuScore < 0) {
-        bearish += Math.abs(ichimokuScore);
+     }
+    else if (ichimokuScore < 0) { 
+        bearish += Math.abs(ichimokuScore); 
     }
     // =================================
     // MACD
@@ -1506,42 +1462,32 @@ function getTrend15m() {
     return "NEUTRAL";
 }
 function getSetup5m() {
-
     const trend15m =
         getTrend15m();
-
     const timeframe = "5m";
     const list = candles[timeframe];
-
     if (
         trend15m === "NEUTRAL" ||
         list.length < 60
     ) {
         return "WAIT";
     }
-
     const priceAction =
         getPriceActionStructure(timeframe);
-
     if (!priceAction) {
         return "WAIT";
     }
-
     const ichimoku =
         getIchimokuValues(timeframe);
-
     if (!ichimoku) {
         return "WAIT";
     }
-
     const data =
         list.slice(0, -1);
-
     const closes =
         data.map(
             candle => candle.close
         );
-
     const macdResult =
         MACD.calculate({
             values: closes,
@@ -1551,53 +1497,39 @@ function getSetup5m() {
             SimpleMAOscillator: false,
             SimpleMASignal: false
         });
-
     if (!macdResult.length) {
         return "WAIT";
     }
-
     const macd =
         macdResult[
             macdResult.length - 1
         ];
-
     const bullishPriceAction =
         priceAction.structure ===
         "🟢 BULLISH STRUCTURE";
-
     const bearishPriceAction =
         priceAction.structure ===
         "🔴 BEARISH STRUCTURE";
-
     const bullishMACD =
         macd.MACD > macd.signal;
-
     const bearishMACD =
         macd.MACD < macd.signal;
-
     const bullishIchimoku =
         ichimoku.tenkan > ichimoku.kijun &&
         ichimoku.price > ichimoku.cloudTop;
-
     const bearishIchimoku =
         ichimoku.tenkan < ichimoku.kijun &&
         ichimoku.price < ichimoku.cloudBottom;
-
     if (trend15m === "BULLISH") {
-
         if (
             bullishPriceAction &&
             bullishMACD &&
             bullishIchimoku
         ) {
-            return "LONG READY";
-        }
-
+            return "LONG READY";}
         return "WAIT";
     }
-
     if (trend15m === "BEARISH") {
-
         if (
             bearishPriceAction &&
             bearishMACD &&
@@ -1605,17 +1537,14 @@ function getSetup5m() {
         ) {
             return "SHORT READY";
         }
-
         return "WAIT";
     }
-
     return "WAIT";
 }
 function calculateSetupStrength() {
     const trend15m = getTrend15m();
     const setup5m = getSetup5m();
     const list = candles["5m"];
-
     if (
         list.length < 60 ||
         trend15m === "NEUTRAL"
@@ -1634,21 +1563,15 @@ function calculateSetupStrength() {
             strength: "WEAK"
         };
     }
-
     let score = 0;
-
     const priceAction =
         getPriceActionStructure("5m");
-
     const ichimoku =
         getIchimokuValues("5m");
-
     const data =
         list.slice(0, -1);
-
     const closes =
         data.map(candle => candle.close);
-
     const macdResult = MACD.calculate({
         values: closes,
         fastPeriod: 12,
@@ -1657,131 +1580,108 @@ function calculateSetupStrength() {
         SimpleMAOscillator: false,
         SimpleMASignal: false
     });
-
     if (!priceAction || !ichimoku || !macdResult.length) {
         return {
             score: 0,
             strength: "WEAK"
         };
     }
-
     const macd =
         macdResult[macdResult.length - 1];
-
     // =========================
     // 15m Trend
     // =========================
-
     score += 2;
-
     // =========================
     // 5m Price Action Structure
     // =========================
-
     if (
         trend15m === "BULLISH" &&
         priceAction.structure === "🟢 BULLISH STRUCTURE"
     ) {
         score += 2;
     }
-
     if (
         trend15m === "BEARISH" &&
         priceAction.structure === "🔴 BEARISH STRUCTURE"
     ) {
         score += 2;
     }
-
     // =========================
     // 5m Breakout
     // =========================
-
     if (
         trend15m === "BULLISH" &&
         priceAction.breakout === "🟢 BULLISH BREAKOUT"
     ) {
         score += 1;
     }
-
     if (
         trend15m === "BEARISH" &&
         priceAction.breakout === "🔴 BEARISH BREAKDOWN"
     ) {
         score += 1;
     }
-
     // =========================
     // 5m MACD
     // =========================
-
     if (
         trend15m === "BULLISH" &&
         macd.MACD > macd.signal
     ) {
         score += 1;
     }
-
     if (
         trend15m === "BEARISH" &&
         macd.MACD < macd.signal
     ) {
         score += 1;
     }
-
     // =========================
     // 5m Ichimoku
     // =========================
-
     if (
         trend15m === "BULLISH" &&
         ichimoku.tenkan > ichimoku.kijun
     ) {
         score += 1;
     }
-
     if (
         trend15m === "BEARISH" &&
         ichimoku.tenkan < ichimoku.kijun
     ) {
         score += 1;
     }
-
     // =========================
     // Price vs Cloud
     // =========================
-
     if (
         trend15m === "BULLISH" &&
         ichimoku.price > ichimoku.cloudTop
     ) {
         score += 1;
     }
-
     if (
         trend15m === "BEARISH" &&
         ichimoku.price < ichimoku.cloudBottom
     ) {
         score += 1;
     }
-
     // =========================
     // Strength
     // =========================
-
     if (score === 8) {
         return {
             score,
             strength: "STRONG"
         };
     }
-
     if (score === 7) {
         return {
             score,
             strength: "MEDIUM"
         };
     }
-
     return {
         score,
         strength: "WEAK"
@@ -1790,178 +1690,115 @@ function calculateSetupStrength() {
 function getTrigger1m() {
     const setup5m =
         getSetup5m();
-
     const list =
         candles["1m"];
-
-
     // ================================
     // Setup Validation
     // ================================
-
     if (
         setup5m !== "LONG READY" &&
         setup5m !== "SHORT READY"
     ) {
         return "WAIT";
     }
-
-
     if (list.length < 30) {
         return "WAIT";
     }
-
-
     // ================================
     // Closed Candles Only
     // ================================
-
     const data =
         list.slice(0, -1);
-
     const last =
         data[data.length - 1];
-
-
     // ================================
     // Previous 5 Candles
     // ================================
-
     const previousCandles =
         data.slice(-6, -1);
-
     let resistance =
         -Infinity;
-
     let support =
         Infinity;
-
-
     for (const candle of previousCandles) {
-
         resistance =
             Math.max(
                 resistance,
                 candle.high
             );
-
         support =
             Math.min(
                 support,
                 candle.low
             );
     }
-
-
     // ================================
     // MACD
     // ================================
-
     const closes =
         data.map(
             candle => candle.close
         );
-
     const macdResult =
         MACD.calculate({
-
             values: closes,
-
             fastPeriod: 12,
-
             slowPeriod: 26,
-
             signalPeriod: 9,
-
             SimpleMAOscillator: false,
-
             SimpleMASignal: false
         });
-
-
     if (!macdResult.length) {
         return "WAIT";
     }
-
-
     const macd =
         macdResult[
             macdResult.length - 1
         ];
-
-
     if (
         macd.MACD === undefined ||
         macd.signal === undefined
     ) {
         return "WAIT";
     }
-
-
     // ================================
     // LONG TRIGGER
     // ================================
-
     if (setup5m === "LONG READY") {
-
         const bullishMACD =
             macd.MACD > macd.signal;
-
-
         const bullishBreakout =
             last.close > resistance;
-
-
         const bullishCandle =
             last.close > last.open;
-
-
         if (
             bullishBreakout &&
             bullishMACD &&
             bullishCandle
         ) {
-
             return "LONG TRIGGER";
         }
-
-
         return "WAIT";
     }
-
-
     // ================================
     // SHORT TRIGGER
     // ================================
-
     if (setup5m === "SHORT READY") {
-
         const bearishMACD =
             macd.MACD < macd.signal;
-
-
         const bearishBreakdown =
             last.close < support;
-
-
         const bearishCandle =
             last.close < last.open;
-
-
         if (
             bearishBreakdown &&
             bearishMACD &&
             bearishCandle
         ) {
-
             return "SHORT TRIGGER";
         }
-
-
         return "WAIT";
     }
-
-
     return "WAIT";
 }
 function getEntryType(direction) {
@@ -2020,7 +1857,6 @@ function calculateEntryPrice(direction, entryType) {
         -Infinity;
     let support =
         Infinity;
-
     for (const candle of previousCandles) {
         if (candle.high > resistance) {
             resistance =
@@ -2064,27 +1900,20 @@ function calculateEntryPrice(direction, entryType) {
     return null;
 }
 function calculateSmartStopLoss(direction) {
-
     const priceAction =
         getPriceActionStructure("5m");
-
     if (!priceAction) {
         return null;
     }
-
     if (direction === "LONG") {
         return priceAction.lastLow;
     }
-
     if (direction === "SHORT") {
         return priceAction.lastHigh;
     }
-
     return null;
 }
-
 function calculateRiskPercent(direction, entry, stopLoss) {
-
     if (
         !Number.isFinite(entry) ||
         !Number.isFinite(stopLoss) ||
@@ -2093,70 +1922,44 @@ function calculateRiskPercent(direction, entry, stopLoss) {
     ) {
         return null;
     }
-
-
     let risk = 0;
-
-
     // ================================
     // LONG
     // ================================
-
     if (direction === "LONG") {
-
         risk =
             entry - stopLoss;
-
     }
-
-
     // ================================
     // SHORT
     // ================================
-
     else if (direction === "SHORT") {
-
         risk =
             stopLoss - entry;
-
     }
-
-
     // ================================
     // Invalid Direction
     // ================================
-
     else {
-
         return null;
     }
-
-
     // ================================
     // Invalid Risk
     // ================================
-
     if (
         !Number.isFinite(risk) ||
         risk <= 0
     ) {
         return null;
     }
-
-
     // ================================
     // Risk Percent
     // ================================
-
     const riskPercent =
         (risk / entry) * 100;
-
-
     if (!Number.isFinite(riskPercent)) {
         return null;
     }
-
-
     return riskPercent;
 }
 function calculateRiskUSDT(direction, entry, stopLoss) {
@@ -2191,13 +1994,10 @@ function calculatePositionSize(entry) {
     ) {
         return null;
     }
-
     const positionValue =
         MARGIN_USDT * LEVERAGE;
-
     const quantity =
         positionValue / entry;
-
     return {
         margin: MARGIN_USDT,
         leverage: LEVERAGE,
@@ -2205,403 +2005,264 @@ function calculatePositionSize(entry) {
         quantity
     };
 }
-
 function calculateTradeLevels(direction) {
-
     const list =
         candles["1m"];
-
     if (list.length < 20) {
         return null;
     }
-
-
     // ================================
     // Entry Type
     // ================================
-
     const entryType =
         getEntryType(direction);
-
     if (entryType === "WAIT") {
         return null;
     }
-
-
     // ================================
     // Entry Price
     // ================================
-
     const entry =
         calculateEntryPrice(
             direction,
             entryType
         );
-
     if (entry === null) {
         return null;
     }
-
-
     // ================================
     // Smart Stop Loss
     // ================================
-
     const smartStopLoss =
         calculateSmartStopLoss(direction);
-
     if (smartStopLoss === null) {
         return null;
     }
-
     const stopLoss =
         smartStopLoss;
-
-
     // ================================
     // SL Position Validation
     // ================================
-
     if (direction === "LONG" && stopLoss >= entry) {
-
         console.log(
             `🔴 NO TRADE — LONG SL is not below Entry`
         );
-
         return null;
     }
-
     if (direction === "SHORT" && stopLoss <= entry) {
-
         console.log(
             `🔴 NO TRADE — SHORT SL is not above Entry`
         );
-
         return null;
     }
-
-
     // ================================
     // SL Risk %
     // ================================
-
     const riskPercent =
         calculateRiskPercent(
             direction,
             entry,
             stopLoss
         );
-
     if (riskPercent === null) {
         return null;
     }
-
     // ================================
     // SL Risk Status
     // ================================
-
     let slRiskStatus = "LOW";
-
     if (riskPercent > LOW_RISK_SL_PERCENT) {
         slRiskStatus = "ACCEPTABLE";
     }
-
     // ================================
     // SL Distance Filter
     // ================================
-
     if (riskPercent > MAX_SL_PERCENT) {
-
         console.log(
             `🔴 NO TRADE — SL distance ${riskPercent.toFixed(2)}% > ${MAX_SL_PERCENT}%`
         );
-
         return null;
     }
-
-
     // ================================
     // Position Size
     // ================================
-
     const positionSize =
         calculatePositionSize(entry);
-
-
     // ================================
     // Risk USDT
     // ================================
-
     const riskUSDT =
         calculateRiskUSDT(
             direction,
             entry,
             stopLoss
         );
-
-
     // ================================
     // LONG
     // ================================
-
     if (direction === "LONG") {
-
         const risk =
             entry - stopLoss;
-
         if (risk <= 0) {
             return null;
         }
-
         const tp1 =
             entry + risk * 1.5;
-
         const tp2 =
             entry + risk * 2.5;
-
         return {
-
             direction: "LONG",
-
             entryType,
-
             entry,
-
             stopLoss,
-
             tp1,
-
             tp2,
-
             riskPercent,
-
             slRiskStatus,
-
             positionSize,
-
             riskUSDT,
-
             riskRewardTP1: 1.5,
-
             riskRewardTP2: 2.5
         };
     }
-
-
     // ================================
     // SHORT
     // ================================
-
     if (direction === "SHORT") {
-
         const risk =
             stopLoss - entry;
-
         if (risk <= 0) {
             return null;
         }
-
         const tp1 =
             entry - risk * 1.5;
-
         const tp2 =
             entry - risk * 2.5;
-
         return {
-
             direction: "SHORT",
-
             entryType,
-
             entry,
-
             stopLoss,
-
             tp1,
-
             tp2,
-
             riskPercent,
-
             slRiskStatus,
-
             positionSize,
-
             riskUSDT,
-
             riskRewardTP1: 1.5,
-
             riskRewardTP2: 2.5
         };
     }
-
-
     return null;
 }
-
 function analyzeMultiTimeframe() {
-
     const direction15m =
         getTimeframeDirection("15m");
-
     const direction5m =
         getTimeframeDirection("5m");
-
     const direction1m =
         getTimeframeDirection("1m");
-
-
     console.log(
         `\n===============================`
     );
-
     console.log(
         `🔎 MULTI-TIMEFRAME ANALYSIS`
     );
-
     console.log(
         `===============================`
     );
-
     console.log(
         `15m Direction : ${direction15m}`
     );
-
     console.log(
         `5m Direction  : ${direction5m}`
     );
-
     console.log(
         `1m Direction  : ${direction1m}`
     );
-
-
     // =================================
     // LONG
     // =================================
-
     if (
         direction15m === "BULLISH" &&
         direction5m === "BULLISH" &&
         direction1m === "BULLISH"
     ) {
-
         console.log(
             `\n🟢 LONG SETUP`
         );
-
         console.log(
             `15m + 5m + 1m aligned`
         );
-
         return "LONG";
     }
-
-
     // =================================
     // SHORT
     // =================================
-
     if (
         direction15m === "BEARISH" &&
         direction5m === "BEARISH" &&
         direction1m === "BEARISH"
     ) {
-
         console.log(
             `\n🔴 SHORT SETUP`
         );
-
         console.log(
             `15m + 5m + 1m aligned`
         );
-
         return "SHORT";
     }
-
-
     // =================================
     // NO TRADE
     // =================================
-
     console.log(
         `\n⚪ NO TRADE`
     );
-
     console.log(
         `Timeframes are not aligned`
     );
-
     return "NO TRADE";
 }
-
 function getIchimokuScore(timeframe) {
-
     const result =
         getIchimokuValues(timeframe);
-
     if (!result) {
         return 0;
     }
-
     let score = 0;
-
-
     // Tenkan / Kijun
     if (result.tenkan > result.kijun) {
-
         score++;
-
     }
     else if (result.tenkan < result.kijun) {
-
         score--;
     }
-
-
     // Price vs Cloud
     if (result.price > result.cloudTop) {
-
         score++;
-
     }
     else if (result.price < result.cloudBottom) {
-
         score--;
     }
-
-
     // Cloud direction
     if (result.senkouA > result.senkouB) {
-
         score++;
-
     }
     else if (result.senkouA < result.senkouB) {
-
         score--;
     }
-
-
     return score;
 }
-
 // ================================
 // WebSocket
 // ================================
-
 function connectWebSocket() {
-
     const ws = new WebSocket(
         "wss://stream.toobit.com/quote/ws/v1"
     );
-
     ws.on("open", () => {
-
         console.log("\n🟢 WebSocket connected");
-
         for (const timeframe of TIMEFRAMES) {
-
             ws.send(
                 JSON.stringify({
                     symbol: SYMBOL,
@@ -2613,27 +2274,18 @@ function connectWebSocket() {
                 })
             );
         }
-
         console.log("📡 Live candles subscribed");
     });
-
     ws.on("ping", () => {
     console.log("📡 WebSocket PING");
 });
-
 ws.on("pong", () => {
     console.log("📡 WebSocket PONG");
 });
-
-
     ws.on("message", (message) => {
-
-
         try {
-
             const data =
                 JSON.parse(message.toString());
-
             if (
                 data.topic !== "kline" ||
                 !data.data ||
@@ -2641,130 +2293,90 @@ ws.on("pong", () => {
             ) {
                 return;
             }
-
             const timeframe =
                 data.params?.klineType;
-
             if (!TIMEFRAMES.includes(timeframe)) {
                 return;
             }
-
             const live =
                 normalizeCandle(data.data[0]);
-
             updateCandle(
                 timeframe,
                 live
             );
-
         } catch (error) {
-
             console.log(
                 "❌ Message error:",
                 error.message
             );
         }
     });
-
-
     ws.on("error", error => {
-
         console.log(
             "❌ WebSocket error:",
             error.message
         );
     });
-
-
     ws.on("close", (code, reason) => {
-
         console.log(
             "🔴 WebSocket disconnected"
         );
-
         console.log(
             `Close Code : ${code}`
         );
-
         console.log(
             `Reason     : ${reason.toString()}`
         );
-
         console.log(
             "🔄 Reconnecting in 5 seconds..."
         );
-
         setTimeout(() => {
             connectWebSocket();
         }, 5000);
     });
-
 }
-
-
 // ================================
 // بروزرسانی کندل
 // ================================
-
-
 function updateCandle(timeframe, liveCandle) {
-
     const list = candles[timeframe];
-
     if (!list.length) {
         list.push(liveCandle);
         return;
     }
-
     const last =
         list[list.length - 1];
-
     // همان کندل در حال تشکیل
     if (liveCandle.time === last.time) {
-
         list[list.length - 1] =
             liveCandle;
-
         return;
     }
-
     // کندل جدید شروع شده
     if (liveCandle.time > last.time) {
-
         // new candle is in progress
         list.push(liveCandle);
-
         if (list.length > LIMIT) {
             list.shift();
         }
-
         // previous candle is now closed
         console.log(
             `🕯️ Closed ${timeframe} candle`
         );
-
         printStatus(timeframe);
-
         runLiveAnalysis(timeframe);
-
     }
 }
-
-
 // ================================
 // نمایش وضعیت
 // ================================
-
 function printStatus(timeframe) {
     const list = candles[timeframe];
-
     if (list.length < 2) {
         return;
     }
-
     // کندل قبلی = کندلی که همین الان بسته شده
     const closedCandle = list[list.length - 2];
-
     console.log(
         `${timeframe} | ` +
         `CLOSED | ` +
